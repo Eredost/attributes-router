@@ -1,0 +1,19 @@
+plugins:
+  phpcodesniffer:
+    enabled: true
+
+  markdownlint:
+    enabled: true
+
+  phpmd:
+    enabled: true
+
+  fixme:
+    enabled: true
+
+exclude_patterns:
+  - "**/node_modules/"
+  - "**/test"
+  - "**/tests"
+  - "tests/"
+  - "**/vendor/"
