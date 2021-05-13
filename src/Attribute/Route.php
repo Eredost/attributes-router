@@ -7,9 +7,13 @@ class Route
 {
     public function __construct(
         private string $path,
-        private string $name,
+        private string $name = '',
         private string $method = 'GET',
-    ) {}
+    ) {
+        if (empty($this->name)) {
+            $this->name = $this->path;
+        }
+    }
 
     /**
      * @return string
@@ -17,6 +21,14 @@ class Route
     public function getPath(): string
     {
         return $this->path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 
     /**
