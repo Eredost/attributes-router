@@ -20,7 +20,7 @@ class Router
 
     /**
      * Define the base URI in order to exclude it in the route correspondence, useful when the project is called from a
-     * subfolder
+     * sub-folder
      *
      * @param string $baseURI Part of the URI to exclude
      */
@@ -56,6 +56,7 @@ class Router
             $baseURI = preg_quote($this->baseURI, '/');
             $request = preg_replace("/^{$baseURI}/", '', $request);
         }
+        $request = (empty($request) ? '/': $request);
 
         foreach ($this->controllers as $controller) {
             $reflectionController = new \ReflectionClass($controller);
@@ -66,8 +67,7 @@ class Router
                 foreach ($routeAttributes as $attribute) {
                     $route = $attribute->newInstance();
 
-                    if ($route->getPath() === $request
-                        && $route->getMethod() === $_SERVER['REQUEST_METHOD']) {
+                    if ($this->matchRequest($request, $route)) {
                         return [
                             'class'  => $method->class,
                             'method' => $method->name,
@@ -79,5 +79,36 @@ class Router
         }
 
         return null;
+    }
+
+    private function matchRequest(string $request, Route $route): bool
+    {
+        $requestArray = explode('/', $request);
+        $pathArray = explode('/', $route->getPath());
+        unset($pathArray[0]);
+
+        if (!$route->getMethod() === $_SERVER['REQUEST_METHOD']) {
+            return false;
+        }
+
+        foreach ($pathArray as $index => $urlPart) {
+            if (isset($requestArray[$index])) {
+                if (str_starts_with($urlPart, '{')) {
+                    $params = explode(' ', preg_replace('/{([\w\-%]+)(<(.+)>)}/', '$1 $3', $urlPart));
+                    $params[1] = $params[1] ?? '[\w\-]+';
+
+                    if (preg_match('/^' . $params[1] . '$/', $requestArray[$index])) {
+                        continue;
+                    }
+
+                } elseif ($urlPart === $requestArray[$index]) {
+                    continue;
+                }
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }
