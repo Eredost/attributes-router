@@ -6,7 +6,7 @@ namespace AttributesRouter\Attribute;
 class Route
 {
     /**
-     * @var array $parameters
+     * @var array $parameters Contains all URI parameters with name as key and corresponding value
      */
     private array $parameters = [];
 
@@ -53,8 +53,8 @@ class Route
     }
 
     /**
-     * @param string $paramName
-     * @param string $value
+     * @param string $paramName Name of the parameter defined in the path
+     * @param string $value     Corresponding value of the parameter
      */
     public function addParameter(string $paramName, string $value): void
     {

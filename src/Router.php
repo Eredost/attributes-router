@@ -79,6 +79,14 @@ class Router
         return null;
     }
 
+    /**
+     * Check if the user's request matches the given route
+     *
+     * @param string $request Request URI
+     * @param Route  $route   Route attribute
+     *
+     * @return bool
+     */
     private function matchRequest(string $request, Route $route): bool
     {
         $requestArray = explode('/', $request);
