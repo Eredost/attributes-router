@@ -43,8 +43,6 @@ class Router
      * Iterate over all the attributes of the controllers in order to find the first one corresponding to the request.
      * If a match is found then an array is returned with the class, method and parameters, otherwise null is returned
      *
-     * @todo support parameters in the url
-     *
      * @return string[]|null
      * @throws \ReflectionException if the controller does not exist
      */
@@ -71,7 +69,7 @@ class Router
                         return [
                             'class'  => $method->class,
                             'method' => $method->name,
-                            'params' => '', // TODO: return url parameters
+                            'params' => $route->getParameters(),
                         ];
                     }
                 }
@@ -94,10 +92,13 @@ class Router
         foreach ($pathArray as $index => $urlPart) {
             if (isset($requestArray[$index])) {
                 if (str_starts_with($urlPart, '{')) {
-                    $params = explode(' ', preg_replace('/{([\w\-%]+)(<(.+)>)}/', '$1 $3', $urlPart));
-                    $params[1] = $params[1] ?? '[\w\-]+';
+                    $params = explode(' ', preg_replace('/{([\w\-%]+)(<(.+)>)?}/', '$1 $3', $urlPart));
+                    $paramName = $params[0];
+                    $paramRegExp = (empty($params[1]) ? '[\w\-]+': $params[1]);
 
-                    if (preg_match('/^' . $params[1] . '$/', $requestArray[$index])) {
+                    if (preg_match('/^' . $paramRegExp . '$/', $requestArray[$index])) {
+                        $route->addParameter($paramName, $requestArray[$index]);
+
                         continue;
                     }
 
