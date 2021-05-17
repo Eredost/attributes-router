@@ -19,20 +19,33 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router = null;
     }
 
+    protected function setServerGlobals(string $uri, string $method = 'GET'): void
+    {
+        $_SERVER['REQUEST_URI'] = $uri;
+        $_SERVER['REQUEST_METHOD'] = $method;
+    }
+
     public function testSuccessfulMatch(): void
     {
-        $_SERVER['REQUEST_URI'] = '/';
-        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->setServerGlobals('/');
         $match = $this->router->match();
 
         self::assertEquals(TestController::class, $match['class']);
         self::assertEquals(TestController::HOMEPAGE_METHOD, $match['method']);
     }
 
-    public function testNoMatch(): void
+    public function testBadPath(): void
     {
-        $_SERVER['REQUEST_URI'] = '/non-existing-page';
-        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->setServerGlobals('/non-existing-page');
+        $match = $this->router->match();
+
+        self::assertNull($match);
+    }
+
+    public function testCorrectPathBadMethod(): void
+    {
+        $this->setServerGlobals('/', 'POST');
+        $_SERVER['REQUEST_METHOD'] = 'POST';
         $match = $this->router->match();
 
         self::assertNull($match);
@@ -40,12 +53,41 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testSuccessfulMatchWithBaseURI(): void
     {
-        $_SERVER['REQUEST_URI'] = 'subfolder/another-subfolder/contact';
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $this->router->setBaseURI('subfolder/another-subfolder');
+        $this->setServerGlobals('/subfolder/another-subfolder/contact');
+        $this->router->setBaseURI('/subfolder/another-subfolder');
         $match = $this->router->match();
 
         self::assertEquals(TestController::class, $match['class']);
         self::assertEquals(TestController::CONTACT_METHOD, $match['method']);
+    }
+
+    public function testSuccessfulMatchOnDynamicPath(): void
+    {
+        $this->setServerGlobals('/blog/hello-world/comment/5');
+        $match = $this->router->match();
+
+        self::assertEquals(TestController::class, $match['class']);
+        self::assertEquals(TestController::BLOG_COMMENT_METHOD, $match['method']);
+
+        self::assertArrayHasKey('slug', $match['params']);
+        self::assertArrayHasKey('id', $match['params']);
+        self::assertEquals('hello-world', $match['params']['slug']);
+        self::assertEquals('5', $match['params']['id']);
+    }
+
+    public function testInvalidParamOnDynamicRoute(): void
+    {
+        $this->setServerGlobals('/blog/hello-world/comment/id');
+        $match = $this->router->match();
+
+        self::assertNull($match);
+    }
+
+    public function testNoMatchOnDynamicRoute(): void
+    {
+        $this->setServerGlobals('/blog/hello-world/comment/5/edit');
+        $match = $this->router->match();
+
+        self::assertNull($match);
     }
 }

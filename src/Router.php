@@ -91,11 +91,12 @@ class Router
     {
         $requestArray = explode('/', $request);
         $pathArray = explode('/', $route->getPath());
-        unset($pathArray[0]);
 
-        if (!$route->getMethod() === $_SERVER['REQUEST_METHOD']) {
+        if (!($route->getMethod() === $_SERVER['REQUEST_METHOD'])
+            || !(count($requestArray) === count($pathArray))) {
             return false;
         }
+        unset($pathArray[0]);
 
         foreach ($pathArray as $index => $urlPart) {
             if (isset($requestArray[$index])) {
