@@ -110,7 +110,6 @@ class Router
 
                         continue;
                     }
-
                 } elseif ($urlPart === $requestArray[$index]) {
                     continue;
                 }
