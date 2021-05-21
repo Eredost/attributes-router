@@ -13,7 +13,7 @@ class Route
     public function __construct(
         private string $path,
         private string $name = '',
-        private string $method = 'GET',
+        private array $methods = ['GET'],
     ) {
         if (empty($this->name)) {
             $this->name = $this->path;
@@ -37,11 +37,11 @@ class Route
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getMethod(): string
+    public function getMethods(): array
     {
-        return $this->method;
+        return $this->methods;
     }
 
     /**

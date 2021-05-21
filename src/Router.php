@@ -92,8 +92,8 @@ class Router
         $requestArray = explode('/', $request);
         $pathArray = explode('/', $route->getPath());
 
-        if (!($route->getMethod() === $_SERVER['REQUEST_METHOD'])
-            || !(count($requestArray) === count($pathArray))) {
+        if (!(count($requestArray) === count($pathArray))
+            || !(in_array($_SERVER['REQUEST_METHOD'], $route->getMethods(), true))) {
             return false;
         }
         unset($pathArray[0]);

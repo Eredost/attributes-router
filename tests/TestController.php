@@ -18,7 +18,7 @@ class TestController
     {
     }
 
-    #[Route('/blog/{slug}/comment/{id<\d+>}', method: 'GET')]
+    #[Route('/blog/{slug}/comment/{id<\d+>}', methods: ['GET'])]
     public function blogComment(): void
     {
     }
