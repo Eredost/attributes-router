@@ -24,3 +24,70 @@ Attributes router is a light library allowing to set up a router and to define r
    ```shell
    composer require eredost/attributes-router:dev-main
    ```
+
+## Usage
+
+Simple usage of the router:
+
+- Define routes in your controller
+
+   ```php
+   <?php
+   
+  namespace App\Controller;
+  
+  use AttributesRouter\Attribute\Route;
+  
+  class MainController 
+  {
+      #[Route('/', methods: ['GET', 'POST'])]
+      public function home()
+      {
+      }
+  }
+   ```
+
+- Create the router passing as argument the controllers on which you have defined routes attributes.
+
+   ```php
+   <?php
+
+   use App\Controller\MainController;
+   use AttributesRouter\Router;
+   
+   require 'vendor/autoload.php';
+   
+   $router = new Router([MainController::class]);
+  
+   if ($match = $router->match()) {
+       $controller = new $match['class']();
+       $controller->{$match['method']}($match['params']);
+   }
+   ```
+
+### Add controllers
+
+You have the possibility after instantiating the Router object to be able to add new controllers, these will be added
+with those already stored.
+
+```php
+$router->addControllers([AnotherController::class]);
+```
+
+### Define a base URI
+
+It can be interesting in certain cases, such as for example when your project is called from a sub-directory, to define
+a base URI so that this one is ignored when the router compares the routes with the current request.
+You can define it either via the constructor or via the setter.
+
+```php
+// Via the Router constructor
+$router = new Router([MainController::class], $baseURI);
+
+// Via the associated setter
+$router->setBaseURI($baseURI);
+```
+
+### Generate a URL from route name
+
+**Coming soon**
