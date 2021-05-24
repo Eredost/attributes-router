@@ -91,3 +91,8 @@ $router->setBaseURI($baseURI);
 ### Generate a URL from route name
 
 **Coming soon**
+
+## Contributing
+
+See the [Contributing.md](CONTRIBUTING.md) file for more information
+on how to contribute to the project.
