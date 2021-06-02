@@ -59,6 +59,8 @@ Simple usage of the router:
    
    $router = new Router([MainController::class]);
   
+   // If there is a match, he will return the class and method associated
+   // to the request as well as route parameters
    if ($match = $router->match()) {
        $controller = new $match['class']();
        $controller->{$match['method']}($match['params']);
