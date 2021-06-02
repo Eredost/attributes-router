@@ -66,13 +66,12 @@ free to propose changes to this document in a pull request.
 
 - Write in English
 - Limit the branch name to 40 characters
-- Name in such a way that it is easily identifiable (example: webpack-encore)
+- Name in such a way that it is easily identifiable (example: reverse-routing)
 
 ### PHP Styleguide
 
 All written PHP code must comply with PSR [1](https://www.php-fig.org/psr/psr-1)
-and [12](https://www.php-fig.org/psr/psr-12/) and must comply with
-[Symfony best practices](https://symfony.com/doc/current/best_practices.html).
+and [12](https://www.php-fig.org/psr/psr-12/).
 
 The PHP code is linted with the [PHP Mess Detector](https://phpmd.org/)
 and [PHP Code Sniffer](https://github.com/squizlabs/PHP_CodeSniffer) tools.
