@@ -23,8 +23,8 @@ free to propose changes to this document in a pull request.
 - Ensure the PR description clearly describes the problem (if no issues
   were opened) and solution. Include the relevant issue number if applicable.
 - The pull request will finally be examined by one or more collaborators of
-  the project and will pass a battery of tests with the CodeClimate and Travis tools, if
-  these fail, changes will have to be made so that it can be merged
+  the project and will pass a battery of tests with the CodeClimate and Travis
+  tools, if these fail, changes will have to be made so that it can be merged
 
 **Do you intend to add a new feature or change an existing one?**
 
@@ -51,16 +51,16 @@ free to propose changes to this document in a pull request.
 - Limit the first line to 72 characters or less
 - Start the commit message with the type, here is a non-exhaustive list
   based on the Angular convention:
-    - **build**: Changes that affect the build system or external
-      dependencies(example scopes: gulp, broccoli, npm)
-    - **ci**: Changes to our CI configuration files and scripts
+  - **build**: Changes that affect the build system or external
+    dependencies(example scopes: gulp, broccoli, npm)
+  - **ci**: Changes to our CI configuration files and scripts
       (example scopes: Circle, BrowserStack, SauceLabs)
-    - **docs**: Documentation only changes
-    - **feat**: A new feature
-    - **fix**: A bug fix
-    - **perf**: A code change that improves performance
-    - **refactor**: A code change that neither fixes a bug nor adds a feature
-    - **test**: Adding missing tests or correcting existing tests
+  - **docs**: Documentation only changes
+  - **feat**: A new feature
+  - **fix**: A bug fix
+  - **perf**: A code change that improves performance
+  - **refactor**: A code change that neither fixes a bug nor adds a feature
+  - **test**: Adding missing tests or correcting existing tests
 
 ### Branch names
 
