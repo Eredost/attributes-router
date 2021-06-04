@@ -60,4 +60,9 @@ class Route
     {
         $this->parameters[$paramName] = $value;
     }
+
+    public function hasParams(): bool
+    {
+        return preg_match('/{([\w\-%]+)(<(.+)>)?}/', $this->path);
+    }
 }

@@ -141,4 +141,19 @@ class Router
 
         return true;
     }
+
+    public function generateUrl(string $name, array $parameters = []): string
+    {
+        if (!isset($this->routes[$name])) {
+            throw new \OutOfRangeException('The route does not exist. Check that the given name is valid.');
+        }
+        /** @var Route $route */
+        $route = $this->routes[$name]['route'];
+
+        if ($route->hasParams()) {
+
+        }
+
+        return $this->baseURI . $route->getPath();
+    }
 }
