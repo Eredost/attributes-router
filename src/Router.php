@@ -151,7 +151,7 @@ class Router
         $route = $this->routes[$name]['route'];
 
         if ($route->hasParams()) {
-
+            $params = $route->fetchParams();
         }
 
         return $this->baseURI . $route->getPath();
