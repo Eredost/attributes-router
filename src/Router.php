@@ -7,6 +7,11 @@ use AttributesRouter\Attribute\Route;
 class Router
 {
     /**
+     * @var array $routes
+     */
+    private array $routes = [];
+
+    /**
      * Allows to define with a single call to the constructor, all the configuration necessary for the operation
      * of the router
      *
@@ -37,6 +42,29 @@ class Router
     public function addControllers(array $controllers): void
     {
         $this->controllers = array_merge($this->controllers, $controllers);
+    }
+
+    /**
+     * Decomposes each of the controllers given in argument and gets all the Route attributes
+     */
+    private function fetchRouteAttributes(array $controllers): void
+    {
+        foreach ($controllers as $controller) {
+            $reflectionController = new \ReflectionClass($controller);
+
+            foreach ($reflectionController->getMethods() as $method) {
+                $routeAttributes = $method->getAttributes(Route::class);
+
+                foreach ($routeAttributes as $routeAttribute) {
+                    $route = $routeAttribute->newInstance();
+                    $this->routes[$route->getName()] = [
+                        'class'  => $method->class,
+                        'method' => $method->name,
+                        'route'  => $route,
+                    ];
+                }
+            }
+        }
     }
 
     /**
