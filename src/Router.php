@@ -19,9 +19,13 @@ class Router
      * @param string $baseURI     Part of the URI to exclude
      */
     public function __construct(
-        private array $controllers = [],
+        array $controllers = [],
         private string $baseURI = '',
-    ) {}
+    ) {
+        if (!empty($controllers)) {
+            $this->fetchRouteAttributes($controllers);
+        }
+    }
 
     /**
      * Define the base URI in order to exclude it in the route correspondence, useful when the project is called from a
@@ -41,7 +45,7 @@ class Router
      */
     public function addControllers(array $controllers): void
     {
-        $this->controllers = array_merge($this->controllers, $controllers);
+        $this->fetchRouteAttributes($controllers);
     }
 
     /**
@@ -72,7 +76,6 @@ class Router
      * If a match is found then an array is returned with the class, method and parameters, otherwise null is returned
      *
      * @return string[]|null
-     * @throws \ReflectionException if the controller does not exist
      */
     public function match(): ?array
     {
@@ -84,23 +87,13 @@ class Router
         }
         $request = (empty($request) ? '/': $request);
 
-        foreach ($this->controllers as $controller) {
-            $reflectionController = new \ReflectionClass($controller);
-
-            foreach ($reflectionController->getMethods() as $method) {
-                $routeAttributes = $method->getAttributes(Route::class);
-
-                foreach ($routeAttributes as $attribute) {
-                    $route = $attribute->newInstance();
-
-                    if ($this->matchRequest($request, $route)) {
-                        return [
-                            'class'  => $method->class,
-                            'method' => $method->name,
-                            'params' => $route->getParameters(),
-                        ];
-                    }
-                }
+        foreach ($this->routes as $route) {
+            if ($this->matchRequest($request, $route['route'])) {
+                return [
+                    'class'  => $route['class'],
+                    'method' => $route['method'],
+                    'params' => $route['route']->getParameters(),
+                ];
             }
         }
 
