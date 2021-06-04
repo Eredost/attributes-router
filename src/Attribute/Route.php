@@ -65,4 +65,11 @@ class Route
     {
         return preg_match('/{([\w\-%]+)(<(.+)>)?}/', $this->path);
     }
+
+    public function fetchParams(): array
+    {
+        preg_match_all('/{([\w\-%]+)(?:<(.+)>)?}/', $this->getPath(), $params);
+
+        return array_combine($params[1], $params[2]);
+    }
 }
