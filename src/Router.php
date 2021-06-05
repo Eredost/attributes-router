@@ -152,6 +152,25 @@ class Router
 
         if ($route->hasParams()) {
             $params = $route->fetchParams();
+            $path = $route->getPath();
+
+            // Verify all parameters are given
+            if ($missingParameters = array_diff_key($params, $parameters)) {
+                throw new \InvalidArgumentException(sprintf('The following parameters are missing for generating the route: %s', implode(', ', array_keys($missingParameters))));
+            }
+
+            // Compare fetched regex with given parameter values
+            foreach ($params as $paramName => $regex) {
+                $regex = (!empty($regex) ? $regex : Route::DEFAULT_REGEX);
+
+                if (!preg_match("/^$regex$/", $parameters[$paramName])) {
+                    throw new \InvalidArgumentException(sprintf('The "%s" route parameter value given does not match the value expected', $paramName));
+                }
+                $path = preg_replace('/{' . $paramName . '(<.+>)?}/', $parameters[$paramName], $path);
+            }
+
+            // TODO: merge two returns into a single one
+            return $this->baseURI . $path;
         }
 
         return $this->baseURI . $route->getPath();

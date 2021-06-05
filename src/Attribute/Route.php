@@ -5,6 +5,8 @@ namespace AttributesRouter\Attribute;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class Route
 {
+    public const DEFAULT_REGEX = '[\w\-]+';
+
     /**
      * @var array $parameters Contains all URI parameters with name as key and corresponding value
      */
