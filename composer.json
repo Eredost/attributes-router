@@ -11,6 +11,11 @@
       "AttributesRouter\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "AttributesRouter\\Tests\\": "tests/"
+    }
+  },
   "require-dev": {
     "phpunit/phpunit": "^9.5"
   }
