@@ -1,17 +1,21 @@
 <?php
 
+namespace AttributesRouter\Tests;
+
+use InvalidArgumentException;
+use OutOfRangeException;
+use PHPUnit\Framework\TestCase;
+use AttributesRouter\Tests\Controller\{TestController, AnotherTestController};
 use AttributesRouter\Router;
 
-require_once 'TestController.php';
-
-class RouterTest extends \PHPUnit\Framework\TestCase
+class RouterTest extends TestCase
 {
     private ?Router $router;
 
     protected function setUp(): void
     {
-        $this->router = new Router();
-        $this->router->addControllers([TestController::class]);
+        $this->router = new Router([TestController::class]);
+        $this->router->addControllers([AnotherTestController::class]);
     }
 
     public function tearDown(): void
@@ -19,7 +23,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router = null;
     }
 
-    protected function setServerGlobals(string $uri, string $method = 'GET'): void
+    protected function setRequestGlobals(string $uri, string $method = 'GET'): void
     {
         $_SERVER['REQUEST_URI'] = $uri;
         $_SERVER['REQUEST_METHOD'] = $method;
@@ -27,7 +31,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testSuccessfulMatch(): void
     {
-        $this->setServerGlobals('/');
+        $this->setRequestGlobals('/');
         $match = $this->router->match();
 
         self::assertEquals(TestController::class, $match['class']);
@@ -36,7 +40,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testBadPath(): void
     {
-        $this->setServerGlobals('/non-existing-page');
+        $this->setRequestGlobals('/non-existing-page');
         $match = $this->router->match();
 
         self::assertNull($match);
@@ -44,7 +48,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testCorrectPathBadMethod(): void
     {
-        $this->setServerGlobals('/', 'POST');
+        $this->setRequestGlobals('/', 'POST');
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $match = $this->router->match();
 
@@ -53,7 +57,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testSuccessfulMatchWithBaseURI(): void
     {
-        $this->setServerGlobals('/subfolder/another-subfolder/contact');
+        $this->setRequestGlobals('/subfolder/another-subfolder/contact');
         $this->router->setBaseURI('/subfolder/another-subfolder');
         $match = $this->router->match();
 
@@ -63,7 +67,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testSuccessfulMatchOnDynamicPath(): void
     {
-        $this->setServerGlobals('/blog/hello-world/comment/5');
+        $this->setRequestGlobals('/blog/hello-world/comment/5');
         $match = $this->router->match();
 
         self::assertEquals(TestController::class, $match['class']);
@@ -77,7 +81,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidParamOnDynamicRoute(): void
     {
-        $this->setServerGlobals('/blog/hello-world/comment/id');
+        $this->setRequestGlobals('/blog/hello-world/comment/id');
         $match = $this->router->match();
 
         self::assertNull($match);
@@ -85,9 +89,41 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     public function testNoMatchOnDynamicRoute(): void
     {
-        $this->setServerGlobals('/blog/hello-world/comment/5/edit');
+        $this->setRequestGlobals('/blog/hello-world/comment/5/edit');
         $match = $this->router->match();
 
         self::assertNull($match);
+    }
+
+    public function testUrlGeneration(): void
+    {
+        $path = $this->router->generateUrl('homepage');
+
+        self::assertEquals('/', $path);
+    }
+
+    public function testUrlGenerationOnDynamicRoute(): void
+    {
+        $path = $this->router->generateUrl('blog-comment', ['slug' => 'hello-world', 'id' => 15]);
+
+        self::assertEquals('/blog/hello-world/comment/15', $path);
+    }
+
+    public function testUrlGenerationWithInvalidRouteName(): void
+    {
+        $this->expectException(OutOfRangeException::class);
+        $this->router->generateUrl('non-existing-page');
+    }
+
+    public function testUrlGenerationWithMissingParams(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->router->generateUrl('blog-comment');
+    }
+
+    public function testUrlGenerationWithInvalidParamValue(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->router->generateUrl('blog-comment', ['slug' => 'hello-world', 'id' => 'invalid-id']);
     }
 }
