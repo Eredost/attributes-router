@@ -49,7 +49,7 @@ Simple usage of the router:
       public function home()
       {
       }
-  
+
       #[Route('/article/{slug}/comment/{id<\d+>}', name: 'article-comment')]
       public function comment()
       {

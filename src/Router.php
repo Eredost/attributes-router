@@ -154,7 +154,10 @@ class Router
     public function generateUrl(string $routeName, array $parameters = []): string
     {
         if (!isset($this->routes[$routeName])) {
-            throw new \OutOfRangeException(sprintf('The route does not exist. Check that the given route name "%s" is valid.', $routeName));
+            throw new \OutOfRangeException(sprintf(
+                'The route does not exist. Check that the given route name "%s" is valid.',
+                $routeName
+            ));
         }
         /** @var Route $route */
         $route = $this->routes[$routeName]['route'];
@@ -165,15 +168,23 @@ class Router
 
             // Checks that all parameters are provided
             if ($missingParameters = array_diff_key($routeParams, $parameters)) {
-                throw new \InvalidArgumentException(sprintf('The following parameters are missing for generating the route "%s": %s', $routeName, implode(', ', array_keys($missingParameters))));
+                throw new \InvalidArgumentException(sprintf(
+                    'The following parameters are missing for generating the route "%s": %s',
+                    $routeName,
+                    implode(', ', array_keys($missingParameters))
+                ));
             }
 
-            // Compare each of the values provided with the regular expressions contained in the path and replace it in the path if it is valid
+            // Compare each of the values provided with the regular expressions contained in the path and replace it in
+            // the path if it is valid
             foreach ($routeParams as $paramName => $regex) {
                 $regex = (!empty($regex) ? $regex : Route::DEFAULT_REGEX);
 
                 if (!preg_match("/^$regex$/", $parameters[$paramName])) {
-                    throw new \InvalidArgumentException(sprintf('The "%s" route parameter value given does not match the regular expression', $paramName));
+                    throw new \InvalidArgumentException(sprintf(
+                        'The "%s" route parameter value given does not match the regular expression',
+                        $paramName
+                    ));
                 }
                 $path = preg_replace('/{' . $paramName . '(<.+>)?}/', $parameters[$paramName], $path);
             }
