@@ -9,8 +9,11 @@ to define routes via the attributes of PHP 8.
 
 ## Installation
 
+Before, you can download the library you must first have a version of
+PHP ~8.0 and a recent version of Composer.
+
 1. First, as the library is not referenced on Packagist, you will have
-  to add the repository in the configuration of the composer.json
+  to add the repository in the configuration of your composer.json
 
    ```json
    "repositories": [
@@ -31,7 +34,7 @@ to define routes via the attributes of PHP 8.
 
 Simple usage of the router:
 
-- Define routes in your controller
+- Define the routes in your controller with the Route attribute
 
    ```php
    <?php
@@ -42,8 +45,13 @@ Simple usage of the router:
 
   class MainController
   {
-      #[Route('/', methods: ['GET', 'POST'])]
+      #[Route('/', name: 'homepage', methods: ['GET', 'POST'])]
       public function home()
+      {
+      }
+  
+      #[Route('/article/{slug}/comment/{id<\d+>}', name: 'article-comment')]
+      public function comment()
       {
       }
   }
@@ -76,7 +84,7 @@ You have the possibility after instantiating the Router object to be able
 to add new controllers, these will be added with those already stored.
 
 ```php
-$router->addControllers([AnotherController::class]);
+$router->addRoutes([AnotherController::class]);
 ```
 
 ### Define a base URI
@@ -88,15 +96,19 @@ define it either via the constructor or via the setter.
 
 ```php
 // Via the Router constructor
-$router = new Router([MainController::class], $baseURI);
+$router = new Router([MainController::class], '/dir/sub-dir');
 
 // Via the associated setter
-$router->setBaseURI($baseURI);
+$router->setBaseURI('/dir/sub-dir');
 ```
 
 ### Generate a URL from route name
 
-#### Coming soon
+You have the possibility from the name of the route, to generate a URL.
+
+```php
+$router->generateUrl('article-comment', ['slug' => 'hello-world', 'id' => 15]);
+```
 
 ## Contributing
 
