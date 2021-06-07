@@ -5,10 +5,13 @@ namespace AttributesRouter\Attribute;
 #[\Attribute(\Attribute::TARGET_METHOD)]
 class Route
 {
+    /**
+     * Default regular expression when none is defined in the parameter
+     */
     public const DEFAULT_REGEX = '[\w\-]+';
 
     /**
-     * @var array $parameters Contains all URI parameters with name as key and corresponding value
+     * @var array $parameters Keeps the parameters cached with the associated regex
      */
     private array $parameters = [];
 
@@ -47,23 +50,6 @@ class Route
     }
 
     /**
-     * @return array
-     */
-    public function getParameters(): array
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @param string $paramName Name of the parameter defined in the path
-     * @param string $value     Corresponding value of the parameter
-     */
-    public function addParameter(string $paramName, string $value): void
-    {
-        $this->parameters[$paramName] = $value;
-    }
-
-    /**
      * Checks the presence of parameters in the path of the route
      *
      * @return bool
@@ -81,8 +67,11 @@ class Route
      */
     public function fetchParams(): array
     {
-        preg_match_all('/{([\w\-%]+)(?:<(.+)>)?}/', $this->getPath(), $params);
+        if (empty($this->parameters)) {
+            preg_match_all('/{([\w\-%]+)(?:<(.+)>)?}/', $this->getPath(), $params);
+            $this->parameters = array_combine($params[1], $params[2]);
+        }
 
-        return array_combine($params[1], $params[2]);
+        return $this->parameters;
     }
 }
