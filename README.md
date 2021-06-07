@@ -27,7 +27,7 @@ PHP ~8.0 and a recent version of Composer.
 2. Then, all you have to do is install the library using the following command:
 
    ```shell
-   composer require eredost/attributes-router:dev-main
+   composer require eredost/attributes-router
    ```
 
 ## Usage
