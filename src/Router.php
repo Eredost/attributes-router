@@ -7,6 +7,9 @@ use AttributesRouter\Attribute\Route;
 class Router
 {
     /**
+     * Array that will contain in value, each of the routes defined in the controllers with the target class and
+     * method and the name of the route as the key.
+     *
      * @var array $routes
      */
     private array $routes = [];
@@ -16,14 +19,16 @@ class Router
      * of the router
      *
      * @param array  $controllers Classes containing Route attributes
-     * @param string $baseURI     Part of the URI to exclude
+     * @param string $baseURI Part of the URI to exclude
+     *
+     * @throws \ReflectionException when the controller does not exist
      */
     public function __construct(
         array $controllers = [],
         private string $baseURI = '',
     ) {
         if (!empty($controllers)) {
-            $this->fetchRouteAttributes($controllers);
+            $this->addRoutes($controllers);
         }
     }
 
@@ -39,31 +44,26 @@ class Router
     }
 
     /**
-     * Add the controllers sent as arguments to those already stored
+     * Breaks down each of the controllers given as arguments to extract the routes attributes, instantiate them and
+     * store them with the target class and method
      *
-     * @param array $controllers Classes containing Route attributes
+     * @param array $controllers
+     *
+     * @throws \ReflectionException when the controller does not exist
      */
-    public function addControllers(array $controllers): void
-    {
-        $this->fetchRouteAttributes($controllers);
-    }
-
-    /**
-     * Decomposes each of the controllers given in argument and gets all the Route attributes
-     */
-    private function fetchRouteAttributes(array $controllers): void
+    public function addRoutes(array $controllers): void
     {
         foreach ($controllers as $controller) {
             $reflectionController = new \ReflectionClass($controller);
 
-            foreach ($reflectionController->getMethods() as $method) {
-                $routeAttributes = $method->getAttributes(Route::class);
+            foreach ($reflectionController->getMethods() as $reflectionMethod) {
+                $routeAttributes = $reflectionMethod->getAttributes(Route::class);
 
                 foreach ($routeAttributes as $routeAttribute) {
                     $route = $routeAttribute->newInstance();
                     $this->routes[$route->getName()] = [
-                        'class'  => $method->class,
-                        'method' => $method->name,
+                        'class'  => $reflectionMethod->class,
+                        'method' => $reflectionMethod->name,
                         'route'  => $route,
                     ];
                 }
@@ -142,24 +142,32 @@ class Router
         return true;
     }
 
+    /**
+     * Generate a URL according to the name of the route
+     *
+     * @param string $name       The name of the route to generate
+     * @param array  $parameters The parameters to provide if it is a dynamic route
+     *
+     * @return string
+     */
     public function generateUrl(string $name, array $parameters = []): string
     {
         if (!isset($this->routes[$name])) {
-            throw new \OutOfRangeException('The route does not exist. Check that the given name is valid.');
+            throw new \OutOfRangeException(sprintf('The route does not exist. Check that the given name "%s" is valid.', $name));
         }
         /** @var Route $route */
         $route = $this->routes[$name]['route'];
+        $path = $route->getPath();
 
         if ($route->hasParams()) {
             $params = $route->fetchParams();
-            $path = $route->getPath();
 
-            // Verify all parameters are given
+            // Checks that all parameters are provided
             if ($missingParameters = array_diff_key($params, $parameters)) {
                 throw new \InvalidArgumentException(sprintf('The following parameters are missing for generating the route: %s', implode(', ', array_keys($missingParameters))));
             }
 
-            // Compare fetched regex with given parameter values
+            // Compare each of the values provided with the regular expressions contained in the path
             foreach ($params as $paramName => $regex) {
                 $regex = (!empty($regex) ? $regex : Route::DEFAULT_REGEX);
 
@@ -168,11 +176,8 @@ class Router
                 }
                 $path = preg_replace('/{' . $paramName . '(<.+>)?}/', $parameters[$paramName], $path);
             }
-
-            // TODO: merge two returns into a single one
-            return $this->baseURI . $path;
         }
 
-        return $this->baseURI . $route->getPath();
+        return $this->baseURI . $path;
     }
 }

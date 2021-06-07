@@ -15,7 +15,7 @@ class RouterTest extends TestCase
     protected function setUp(): void
     {
         $this->router = new Router([TestController::class]);
-        $this->router->addControllers([AnotherTestController::class]);
+        $this->router->addRoutes([AnotherTestController::class]);
     }
 
     public function tearDown(): void
@@ -49,7 +49,6 @@ class RouterTest extends TestCase
     public function testCorrectPathBadMethod(): void
     {
         $this->setRequestGlobals('/', 'POST');
-        $_SERVER['REQUEST_METHOD'] = 'POST';
         $match = $this->router->match();
 
         self::assertNull($match);

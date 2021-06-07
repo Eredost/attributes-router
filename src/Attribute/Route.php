@@ -63,11 +63,22 @@ class Route
         $this->parameters[$paramName] = $value;
     }
 
+    /**
+     * Checks the presence of parameters in the path of the route
+     *
+     * @return bool
+     */
     public function hasParams(): bool
     {
         return preg_match('/{([\w\-%]+)(<(.+)>)?}/', $this->path);
     }
 
+    /**
+     * Retrieves in key of the array, the names of the parameters as well as the regular expression (if there is one)
+     * in value
+     *
+     * @return array
+     */
     public function fetchParams(): array
     {
         preg_match_all('/{([\w\-%]+)(?:<(.+)>)?}/', $this->getPath(), $params);
