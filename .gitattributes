@@ -4,3 +4,4 @@
 .codeclimate.yml export-ignore
 .travis.yml      export-ignore
 phpunit.xml.dist export-ignore
+CONTRIBUTING.md  export-ignore
