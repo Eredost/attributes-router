@@ -114,11 +114,14 @@ class Router
         $requestArray = explode('/', $request);
         $pathArray = explode('/', $route->getPath());
 
+        // Remove empty values in arrays
+        $requestArray = array_values(array_filter($requestArray, 'strlen'));
+        $pathArray = array_values(array_filter($pathArray, 'strlen'));
+
         if (!(count($requestArray) === count($pathArray))
             || !(in_array($_SERVER['REQUEST_METHOD'], $route->getMethods(), true))) {
             return false;
         }
-        unset($pathArray[0]);
 
         foreach ($pathArray as $index => $urlPart) {
             if (isset($requestArray[$index])) {
