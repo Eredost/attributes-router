@@ -78,6 +78,15 @@ class RouterTest extends TestCase
         self::assertEquals('5', $match['params']['id']);
     }
 
+    public function testMatchWithEndingSlash(): void
+    {
+        $this->setRequestGlobals('/contact/');
+        $match = $this->router->match();
+
+        self::assertEquals(TestController::class, $match['class']);
+        self::assertEquals(TestController::CONTACT_METHOD, $match['method']);
+    }
+
     public function testInvalidParamOnDynamicRoute(): void
     {
         $this->setRequestGlobals('/blog/hello-world/comment/id');
