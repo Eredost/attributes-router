@@ -189,7 +189,7 @@ class Router
                         $paramName
                     ));
                 }
-                $path = preg_replace('/{' . $paramName . '(<.+>)?}/', $parameters[$paramName], $path);
+                $path = preg_replace('/{' . $paramName . '(<.+?>)?}/', $parameters[$paramName], $path);
             }
         }
 
