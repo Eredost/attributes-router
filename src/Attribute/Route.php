@@ -68,7 +68,7 @@ class Route
     public function fetchParams(): array
     {
         if (empty($this->parameters)) {
-            preg_match_all('/{([\w\-%]+)(?:<(.+)>)?}/', $this->getPath(), $params);
+            preg_match_all('/{([\w\-%]+)(?:<(.+?)>)?}/', $this->getPath(), $params);
             $this->parameters = array_combine($params[1], $params[2]);
         }
 
